@@ -5,7 +5,7 @@ from tornado.gen import coroutine
 from uuid import uuid4
 from logging import info
 from .base import BaseHandler
-
+# import the hashing function myCrypt
 from ..utils.myCrypt import myCrypt
 
 
@@ -63,8 +63,12 @@ class LoginHandler(BaseHandler):
         if user is None:
             self.send_error(403, message='The email address and password are invalid!')
             return
+
+# prepare salt use for hashed_password function,hash the pw input from user
         salt = bytes.fromhex(user['salt'])
         hashed_password = myCrypt(password, salt)
+
+# compare the hash result and the pw that storage in database,if correct provide token
         if user['password'] != hashed_password:
             self.send_error(403, message='The email address and password are invalid!')
             return

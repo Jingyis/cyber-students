@@ -4,6 +4,8 @@ from tornado.escape import json_decode, utf8
 from tornado.gen import coroutine
 
 from .base import BaseHandler
+
+# import os and the encrypt function
 import os
 from ..utils.myCrypt import myCrypt, aesInstance, encrypt, decrypt
 
@@ -24,6 +26,7 @@ class RegistrationHandler(BaseHandler):
                 display_name = email
             if not isinstance(display_name, str):
                 raise Exception()
+# identify the information need
             address = body['address'].lower()
             date_of_birth = body['date_of_birth']
             phone_number = body['phone_number']
@@ -51,13 +54,14 @@ class RegistrationHandler(BaseHandler):
         if user is not None:
             self.send_error(409, message='A user with the given email address already exists!')
             return
-
+# general random number use for hashing and encrypt, general encryptor
         salt = os.urandom(16)
         hashed_password = myCrypt(password, salt)
 
         aesinstance = aesInstance(salt)
         encryptor = aesinstance.encryptor()
 
+# save the encrypt data into mangodb
         yield self.db.users.insert_one({
             'email': email,
             'password': hashed_password,

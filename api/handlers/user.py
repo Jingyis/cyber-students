@@ -12,6 +12,8 @@ class UserHandler(AuthHandler):
     def get(self):
         self.set_status(200)
         self.response['email'] = self.current_user['email']
+
+        # read the user detail from database
         encrypted_display_name = self.current_user['encrypted_display_name']
         encrypted_address = self.current_user['encrypted_address']
         encrypted_date_of_birth = self.current_user['encrypted_date_of_birth']
@@ -20,6 +22,8 @@ class UserHandler(AuthHandler):
         salt = self.current_user['salt']
         aesinstance = aesInstance(salt)
         decryptor = aesinstance.decryptor()
+
+        # decrypt the detail and display it
         self.response['displayName'] = decrypt(decryptor, encrypted_display_name)
         self.response['address'] = decrypt(decryptor, encrypted_address)
         self.response['date_of_birth'] = decrypt(decryptor, encrypted_date_of_birth)

@@ -21,7 +21,7 @@ class AuthHandler(BaseHandler):
             self.current_user = None
             self.send_error(400, message='You must provide a token!')
             return
-
+        # verify the token and find the user
         user = yield self.db.users.find_one({
             'token': token
         }, {
@@ -45,7 +45,7 @@ class AuthHandler(BaseHandler):
             self.current_user = None
             self.send_error(403, message='Your token has expired!')
             return
-
+        # decode the data
         self.current_user = {
             'email': user['email'],
             'encrypted_display_name': bytes.fromhex(user['displayName']),
