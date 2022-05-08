@@ -3,8 +3,12 @@ from time import mktime
 from tornado.escape import json_decode, utf8
 from tornado.gen import coroutine
 from uuid import uuid4
-
+from logging import info
 from .base import BaseHandler
+
+from ..utils.myCrypt import myCrypt
+
+
 
 class LoginHandler(BaseHandler):
 
@@ -52,14 +56,16 @@ class LoginHandler(BaseHandler):
         user = yield self.db.users.find_one({
           'email': email
         }, {
-          'password': 1
+          'password': 1,
+          'salt': 1,
         })
 
         if user is None:
             self.send_error(403, message='The email address and password are invalid!')
             return
-
-        if user['password'] != password:
+        salt = bytes.fromhex(user['salt'])
+        hashed_password = myCrypt(password, salt)
+        if user['password'] != hashed_password:
             self.send_error(403, message='The email address and password are invalid!')
             return
 
